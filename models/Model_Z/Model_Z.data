@@ -1,0 +1,131 @@
+-- Copyright (C) Интегрированные разработки для моделирования 2005-2025.
+-- Все права защищены.
+
+
+----------------
+RUNSPEC
+
+UNIFOUT
+
+----------------
+
+
+
+
+START
+ 01 JUN 1991 /
+
+
+OIL
+
+
+WATER
+
+
+GAS
+
+
+DISGAS
+
+
+METRIC
+
+
+ENDSCALE
+ /
+
+
+DIMENS
+ 91 102 59 /
+
+
+TABDIMS
+ 2 2 50 50 5 4 6* 2 /
+
+
+REGDIMS
+ 5 3 /
+
+
+WELLDIMS
+ 137 109 2 137 /
+
+EQLDIMS
+ 15 1* 2 /
+
+
+AQUDIMS
+ 0 0 2* 1 2778 /
+
+
+GRIDOPTS
+ 2* 3 /
+
+LGR
+ 0 /
+
+
+----------------
+GRID
+----------------
+
+
+INCLUDE
+'Model_Z_grid.inc' /
+
+
+----------------
+EDIT
+----------------
+
+
+INCLUDE
+'Model_Z_edit.inc' /
+
+
+----------------
+PROPS
+----------------
+
+
+INCLUDE
+'Model_Z_props.inc' /
+
+
+----------------
+REGIONS
+----------------
+
+
+INCLUDE
+'Model_Z_regs.inc' /
+
+
+----------------
+SOLUTION
+----------------
+
+
+INCLUDE
+'Model_Z_init.inc' /
+
+
+----------------
+SUMMARY
+----------------
+
+
+INCLUDE
+'Model_Z_summary.inc' /
+
+
+----------------
+SCHEDULE
+----------------
+
+
+INCLUDE
+'Model_Z_sch.inc' /
+
+
+END
