@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="640" viewBox="0 0 680 640" role="img" aria-labelledby="title desc">
+<title id="title">Поток данных системы управления фондом скважин</title>
+<desc id="desc">Оптимизатор порождает расписание, которое оценивается быстрым суррогатом или медленным симулятором OPM; обе ветви дают отклик по скважинам, из которого калькулятор считает ЧДД, и результат возвращается оптимизатору.</desc>
+<style>
+.th{font:500 14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.ts{font:400 12px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.purple rect{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}
+.purple .th{fill:#3C3489}
+.purple .ts{fill:#534AB7}
+.coral rect{fill:#FAECE7;stroke:#993C1D;stroke-width:1}
+.coral .th{fill:#712B13}
+.coral .ts{fill:#993C1D}
+.gray rect{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}
+.gray .th{fill:#444441}
+.gray .ts{fill:#5F5E5A}
+.arr{stroke:#5F5E5A;stroke-width:1.5;fill:none}
+.lbl{fill:#5F5E5A}
+@media (prefers-color-scheme:dark){
+.purple rect{fill:#3C3489;stroke:#AFA9EC}
+.purple .th{fill:#CECBF6}
+.purple .ts{fill:#AFA9EC}
+.coral rect{fill:#712B13;stroke:#F0997B}
+.coral .th{fill:#F5C4B3}
+.coral .ts{fill:#F0997B}
+.gray rect{fill:#444441;stroke:#B4B2A9}
+.gray .th{fill:#D3D1C7}
+.gray .ts{fill:#B4B2A9}
+.arr{stroke:#B4B2A9}
+.lbl{fill:#D3D1C7}
+}
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="coral"><rect x="240" y="44" width="200" height="56" rx="4"/><text class="th" x="340" y="62" text-anchor="middle" dominant-baseline="central">Оптимизатор + агенты</text><text class="ts" x="340" y="83" text-anchor="middle" dominant-baseline="central">правило, ≤10 ручек</text></g>
+<g class="purple"><rect x="240" y="140" width="200" height="56" rx="4"/><text class="th" x="340" y="158" text-anchor="middle" dominant-baseline="central">Расписание</text><text class="ts" x="340" y="179" text-anchor="middle" dominant-baseline="central">225 шагов, события</text></g>
+<g class="coral"><rect x="70" y="236" width="220" height="56" rx="4"/><text class="th" x="180" y="254" text-anchor="middle" dominant-baseline="central">Суррогат</text><text class="ts" x="180" y="275" text-anchor="middle" dominant-baseline="central">доли секунды</text></g>
+<g class="purple"><rect x="390" y="236" width="220" height="56" rx="4"/><text class="th" x="500" y="254" text-anchor="middle" dominant-baseline="central">Мост к OPM</text><text class="ts" x="500" y="275" text-anchor="middle" dominant-baseline="central">~15 мин, даёт датасет</text></g>
+<g class="gray"><rect x="240" y="332" width="200" height="56" rx="4"/><text class="th" x="340" y="350" text-anchor="middle" dominant-baseline="central">Отклик по скважинам</text><text class="ts" x="340" y="371" text-anchor="middle" dominant-baseline="central">нефть, вода, давление</text></g>
+<g class="purple"><rect x="240" y="428" width="200" height="56" rx="4"/><text class="th" x="340" y="446" text-anchor="middle" dominant-baseline="central">Калькулятор ЧДД</text><text class="ts" x="340" y="467" text-anchor="middle" dominant-baseline="central">годовой дисконт</text></g>
+<g class="gray"><rect x="240" y="524" width="200" height="56" rx="4"/><text class="th" x="340" y="542" text-anchor="middle" dominant-baseline="central">ЧДД</text><text class="ts" x="340" y="563" text-anchor="middle" dominant-baseline="central">по годам + месяцы</text></g>
+<line class="arr" x1="340" y1="100" x2="340" y2="132" marker-end="url(#arrow)"/>
+<path class="arr" d="M340 196 L340 216 L180 216 L180 228" marker-end="url(#arrow)"/>
+<path class="arr" d="M340 196 L340 216 L500 216 L500 228" marker-end="url(#arrow)"/>
+<path class="arr" d="M180 292 L180 312 L300 312 L300 324" marker-end="url(#arrow)"/>
+<path class="arr" d="M500 292 L500 312 L380 312 L380 324" marker-end="url(#arrow)"/>
+<line class="arr" x1="340" y1="388" x2="340" y2="420" marker-end="url(#arrow)"/>
+<line class="arr" x1="340" y1="484" x2="340" y2="516" marker-end="url(#arrow)"/>
+<path class="arr" d="M240 552 L40 552 L40 72 L232 72" marker-end="url(#arrow)"/>
+<text class="ts lbl" x="50" y="312" text-anchor="start">новый вариант</text>
+<g class="purple"><rect x="152" y="602" width="12" height="12" rx="2"/></g>
+<text class="ts lbl" x="170" y="608" text-anchor="start" dominant-baseline="central">реализация ясна</text>
+<g class="coral"><rect x="299" y="602" width="12" height="12" rx="2"/></g>
+<text class="ts lbl" x="317" y="608" text-anchor="start" dominant-baseline="central">реализация открыта</text>
+<g class="gray"><rect x="467" y="602" width="12" height="12" rx="2"/></g>
+<text class="ts lbl" x="485" y="608" text-anchor="start" dominant-baseline="central">данные</text>
+</svg>
