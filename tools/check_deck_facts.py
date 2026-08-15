@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DECK = ROOT / "models" / "Model_Z" / "Model_Z.data"
 SCH = ROOT / "models" / "Model_Z" / "Model_Z_sch.inc"
+REGS = ROOT / "models" / "Model_Z" / "Model_Z_regs.inc"
 
 T0 = date(2007, 1, 1)
 MONTHS = {
@@ -43,6 +44,43 @@ def read_start() -> date:
         if line.strip() == "START":
             return parse_date(lines[i + 1])
     raise ValueError("в .DATA нет START")
+
+
+def read_dims() -> tuple[int, int, int]:
+    lines = DECK.read_text().split("\n")
+    for i, line in enumerate(lines):
+        if line.strip() == "DIMENS":
+            nx, ny, nz = fields(lines[i + 1])[:3]
+            return int(nx), int(ny), int(nz)
+    raise ValueError("в .DATA нет DIMENS")
+
+
+def read_integer_array(path: Path, keyword: str) -> list[int]:
+    """Прочитать целочисленный Eclipse-массив с поддержкой RLE ``N*value``."""
+
+    lines = path.read_text().split("\n")
+    start = next(i for i, line in enumerate(lines) if line.strip() == keyword)
+    values: list[int] = []
+    for line in lines[start + 1:]:
+        body = line.split("--", 1)[0].strip()
+        if not body:
+            continue
+        for token in body.split():
+            if token == "/":
+                return values
+            if token.endswith("/"):
+                token = token[:-1]
+                is_last = True
+            else:
+                is_last = False
+            if "*" in token:
+                count, value = token.split("*", 1)
+                values.extend([int(value or "0")] * int(count))
+            else:
+                values.append(int(token))
+            if is_last:
+                return values
+    raise ValueError(f"блок {keyword} в {path} не закрыт")
 
 
 def parse_schedule():
@@ -258,7 +296,34 @@ def main() -> None:
     in_wcon = {w for w in first_seen}
     print(f"WELSPECS == множество WCON*      {welspecs == in_wcon}")
     print(f"COMPDAT блоков до первой DATES   {text[:head].count(nl + 'COMPDAT')}")
-    print("\n=== 11. Слова, снятые организаторами при пересборке под OPM (15.08)")
+
+    print("\n=== 11. PVT-регионы подключений")
+    nx, ny, nz = read_dims()
+    pvtnum = read_integer_array(REGS, "PVTNUM")
+    expected_cells = nx * ny * nz
+    if len(pvtnum) != expected_cells:
+        raise ValueError(
+            f"PVTNUM: ожидалось {expected_cells} значений по DIMENS, "
+            f"получено {len(pvtnum)}"
+        )
+    regions_by_well: dict[str, set[int]] = defaultdict(set)
+    for _, keyword, rows in blocks:
+        if keyword != "COMPDAT":
+            continue
+        for row in rows:
+            f = fields(row)
+            well = f[0].strip("'")
+            i, j, k1, k2 = map(int, f[1:5])
+            for k in range(k1, k2 + 1):
+                cell_index = ((k - 1) * ny + (j - 1)) * nx + (i - 1)
+                region = pvtnum[cell_index]
+                if region:
+                    regions_by_well[well].add(region)
+    one_region = sum(len(regions) == 1 for regions in regions_by_well.values())
+    mixed = sorted(well for well, regions in regions_by_well.items() if len(regions) > 1)
+    print(f"скважин в одном PVT-регионе     {one_region}")
+    print(f"скважин в нескольких регионах   {len(mixed)}: {mixed}")
+    print("\n=== 12. Слова, снятые организаторами при пересборке под OPM (15.08)")
     for gone in ("WELLTRACK", "COMPDATMD", "WELTRAJ", "COMPTRAJ", "LGR", "CARFIN"):
         print(f"{gone:10s} вхождений {text.count(nl + gone)}")
 
