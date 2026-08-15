@@ -61,8 +61,10 @@ AQUDIMS
 GRIDOPTS
  2* 3 /
 
-LGR
- 0 /
+-- OPM compatibility: tNavigator's zero-LGR counter is omitted.
+-- No local grids are defined; zero LGR is the OPM default.
+-- LGR
+-- 0 /
 
 
 ----------------

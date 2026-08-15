@@ -1,4 +1,4 @@
-﻿-- Regional cubes transformed consistently to FAST59
+-- Regional cubes transformed consistently to FAST59
 SATNUM
  43*0 8*1 82*0 9*1 81*0 11*1 79*0 12*1
  79*0 12*1 79*0 12*1 79*0 12*1 79*0 12*1

@@ -25,7 +25,11 @@ MONTHS = {
     "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
 }
 # ключевые слова, у которых внутри блока перечисляются скважины
-WELL_KEYWORDS = ("WCONPROD", "WCONINJE", "COMPDATMD", "WPIMULT")
+#
+# COMPDAT, не COMPDATMD: организаторы пересобрали дек 15.08 под внешний
+# симулятор — заканчивание задано индексами ячеек, а не измеренной глубиной
+# вдоль траектории. WELLTRACK из дека исчез вместе с COMPDATMD.
+WELL_KEYWORDS = ("WCONPROD", "WCONINJE", "COMPDAT", "WPIMULT")
 
 
 def parse_date(line: str) -> date:
@@ -122,11 +126,11 @@ def main() -> None:
     print(f"впервые после t0               {later}")
     print(f"вводится внутри горизонта      {len(at_t0) + later}")
 
-    print("\n=== 4. COMPDATMD после t0: классификация записей")
+    print("\n=== 4. COMPDAT после t0: классификация записей")
     n_blocks = primary = modification = 0
     mixed = []
     for di, kw, rows in blocks:
-        if kw != "COMPDATMD" or di < t0_index:
+        if kw != "COMPDAT" or di < t0_index:
             continue
         n_blocks += 1
         kinds = set()
@@ -152,11 +156,11 @@ def main() -> None:
                 shut[kw] += 1
                 if di >= t0_index:
                     shut[kw + "_after_t0"] += 1
-            elif kw == "COMPDATMD" and " SHUT " in row:
-                shut["COMPDATMD"] += 1
+            elif kw == "COMPDAT" and " SHUT " in row:
+                shut["COMPDAT"] += 1
     print(f"записей WCONPROD SHUT          {shut['WCONPROD']} (после t0 {shut['WCONPROD_after_t0']})")
     print(f"записей WCONINJE SHUT          {shut['WCONINJE']}")
-    print(f"записей COMPDATMD SHUT         {shut['COMPDATMD']} (закрытие интервалов перфорации)")
+    print(f"записей COMPDAT SHUT           {shut['COMPDAT']} (закрытие интервалов перфорации)")
 
     print("\n=== 6. Переводы под закачку")
     seen_prod, seen_inj, conversions = set(), set(), []
@@ -237,9 +241,26 @@ def main() -> None:
     print("\n=== 10. Объявление скважин")
     text = SCH.read_text()
     head = text.index("\nDATES")
-    print(f"WELSPECS блоков до первой DATES  {text[:head].count(chr(10) + 'WELSPECS')}")
-    print(f"WELLTRACK блоков до первой DATES {text[:head].count(chr(10) + 'WELLTRACK')}")
-    print(f"WELLTRACK блоков после           {text[head:].count(chr(10) + 'WELLTRACK')}")
+    nl = chr(10)
+    print(f"WELSPECS блоков до первой DATES  {text[:head].count(nl + 'WELSPECS')}")
+    print(f"WELSPECS блоков после            {text[head:].count(nl + 'WELSPECS')}")
+    # считать только строки самого блока WELSPECS: до первой DATES есть ещё
+    # RPTSCHED, чьи строки тоже начинаются с апострофа
+    ws_start = text.index(nl + "WELSPECS") + 1
+    ws_body = text[ws_start:head].split(nl)
+    welspecs = set()
+    for row in ws_body[1:]:
+        if row.strip() == "/":
+            break
+        if row.strip().startswith("'"):
+            welspecs.add(row.split("'")[1])
+    print(f"скважин в начальном WELSPECS     {len(welspecs)}")
+    in_wcon = {w for w in first_seen}
+    print(f"WELSPECS == множество WCON*      {welspecs == in_wcon}")
+    print(f"COMPDAT блоков до первой DATES   {text[:head].count(nl + 'COMPDAT')}")
+    print("\n=== 11. Слова, снятые организаторами при пересборке под OPM (15.08)")
+    for gone in ("WELLTRACK", "COMPDATMD", "WELTRAJ", "COMPTRAJ", "LGR", "CARFIN"):
+        print(f"{gone:10s} вхождений {text.count(nl + gone)}")
 
 
 if __name__ == "__main__":
