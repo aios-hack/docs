@@ -38,7 +38,7 @@ def parse_date(line: str) -> date:
 
 
 def read_start() -> date:
-    lines = DECK.read_text().split("\n")
+    lines = DECK.read_text(encoding="utf-8", errors="replace").split("\n")
     for i, line in enumerate(lines):
         if line.strip() == "START":
             return parse_date(lines[i + 1])
@@ -51,7 +51,7 @@ def parse_schedule():
     Возвращает список дат и список блоков (индекс даты, ключевое слово,
     строки блока). Индекс даты -1 означает блок до первой DATES.
     """
-    lines = SCH.read_text().split("\n")
+    lines = SCH.read_text(encoding="utf-8", errors="replace").split("\n")
     dates: list[date] = []
     blocks: list[tuple[int, str, list[str]]] = []
     i, di = 0, -1
@@ -239,7 +239,7 @@ def main() -> None:
         )
 
     print("\n=== 10. Объявление скважин")
-    text = SCH.read_text()
+    text = SCH.read_text(encoding="utf-8", errors="replace")
     head = text.index("\nDATES")
     nl = chr(10)
     print(f"WELSPECS блоков до первой DATES  {text[:head].count(nl + 'WELSPECS')}")
