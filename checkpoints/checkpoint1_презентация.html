@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIOS — трек 2 — обоснование направления</title>
+<style>
+  :root {
+    --ground: #0f1317;
+    --panel: #161b21;
+    --panel-2: #1d242c;
+    --line: #2a333d;
+    --line-hot: #3d4954;
+    --ink: #e9e6e0;
+    --ink-2: #a8b0b9;
+    --ink-3: #737d87;
+    --oil: #e0a94f;
+    --oil-dim: #7a5c2a;
+    --water: #55b8ad;
+    --water-dim: #2a5c58;
+    --bad: #e07a6e;
+    --good: #7fc08c;
+
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ---------- каркас слайда ---------- */
+  .deck { height: 100%; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: clamp(2rem, 4.5vh, 3.5rem) clamp(2rem, 6vw, 6rem) clamp(4rem, 8vh, 5.5rem);
+    overflow-y: auto;
+  }
+  .slide.on { display: flex; }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: clamp(.62rem, .82vw, .78rem);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--oil);
+    margin-bottom: clamp(.7rem, 1.6vh, 1.2rem);
+    flex-shrink: 0;
+  }
+  .kicker .sep { color: var(--ink-3); margin: 0 .6em; }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 5.6vw, 4.6rem);
+    line-height: 1.08;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.6rem, 3.4vw, 2.7rem);
+    line-height: 1.15;
+    margin: 0 0 clamp(1rem, 2.4vh, 1.8rem);
+    text-wrap: balance;
+    flex-shrink: 0;
+  }
+  h2 .hl { color: var(--oil); }
+
+  .body { display: flex; flex-direction: column; gap: clamp(.9rem, 2vh, 1.5rem); }
+  p { margin: 0; font-size: clamp(.98rem, 1.35vw, 1.28rem); line-height: 1.5; max-width: 54ch; color: var(--ink-2); }
+  p.wide { max-width: 78ch; }
+  p strong, li strong { color: var(--ink); font-weight: 620; }
+  .lead { font-size: clamp(1.1rem, 1.7vw, 1.55rem); color: var(--ink); }
+
+  ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: .5em; max-width: 62ch; }
+  li { font-size: clamp(.95rem, 1.3vw, 1.2rem); line-height: 1.45; color: var(--ink-2); }
+  li::marker { color: var(--oil-dim); }
+
+  code { font-family: var(--mono); font-size: .88em; color: var(--water); }
+
+  /* ---------- титул ---------- */
+  .title-slide { justify-content: center; }
+  .title-slide .sub {
+    font-size: clamp(1rem, 1.6vw, 1.4rem);
+    color: var(--ink-2);
+    margin-top: 1.4rem;
+    max-width: 44ch;
+  }
+  .rule-brass {
+    width: clamp(4rem, 9vw, 8rem);
+    height: 3px;
+    background: var(--oil);
+    margin: clamp(1.4rem, 3vh, 2.2rem) 0;
+  }
+  .title-meta {
+    margin-top: clamp(2rem, 5vh, 3.5rem);
+    font-family: var(--mono);
+    font-size: clamp(.7rem, .95vw, .85rem);
+    color: var(--ink-3);
+    letter-spacing: .06em;
+    line-height: 1.9;
+  }
+
+  /* ---------- разделители ---------- */
+  .part { justify-content: center; background: var(--panel); }
+  .part .n {
+    font-family: var(--mono);
+    font-size: clamp(3rem, 9vw, 7rem);
+    color: var(--oil-dim);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .part h1 { font-size: clamp(1.9rem, 4.6vw, 3.6rem); }
+  .part .why {
+    margin-top: 1.5rem;
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    color: var(--ink-2);
+    max-width: 50ch;
+    line-height: 1.5;
+  }
+
+  /* ---------- цифровые витрины ---------- */
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(9rem, 15vw, 14rem), 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .figs > div { background: var(--panel); padding: clamp(.85rem, 2vh, 1.5rem) clamp(.9rem, 1.5vw, 1.4rem); display: flex; flex-direction: column; gap: .25rem; }
+  .figs .v {
+    font-family: var(--mono);
+    font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+    color: var(--oil);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+  }
+  .figs .v.w { color: var(--water); }
+  .figs .k { font-size: clamp(.76rem, 1vw, .95rem); color: var(--ink-3); line-height: 1.35; }
+
+  /* ---------- две колонки: решение / отвергнуто ---------- */
+  .cols { display: grid; grid-template-columns: 1fr; gap: clamp(.9rem, 2vh, 1.4rem); }
+  @media (min-width: 60rem) { .cols.two { grid-template-columns: 1.25fr 1fr; gap: clamp(1.2rem, 3vw, 2.6rem); } }
+
+  .box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: clamp(.9rem, 2vh, 1.4rem) clamp(1rem, 1.6vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+  }
+  .box.dim { background: transparent; border-style: dashed; }
+  .box .lbl {
+    font-family: var(--mono);
+    font-size: clamp(.6rem, .78vw, .72rem);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .box.hot { border-left: 3px solid var(--oil); }
+  .box.cool { border-left: 3px solid var(--water); }
+  .box.warn { border-left: 3px solid var(--bad); }
+  .box p, .box li { font-size: clamp(.9rem, 1.18vw, 1.08rem); }
+
+  /* ---------- таблица ---------- */
+  .tbl-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 30rem; }
+  th, td {
+    text-align: left;
+    padding: clamp(.42rem, .9vh, .7rem) .8rem;
+    border-bottom: 1px solid var(--line);
+    font-size: clamp(.85rem, 1.1vw, 1.02rem);
+    vertical-align: top;
+    color: var(--ink-2);
+  }
+  th {
+    font-family: var(--mono);
+    font-size: clamp(.6rem, .78vw, .72rem);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom-color: var(--line-hot);
+  }
+  td strong { color: var(--ink); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: clamp(.6rem, .75vw, .7rem);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .15rem .45rem;
+    white-space: nowrap;
+    border: 1px solid;
+  }
+  .chip.ok { color: var(--good); border-color: var(--good); }
+  .chip.no { color: var(--bad); border-color: var(--bad); }
+  .chip.mid { color: var(--oil); border-color: var(--oil); }
+
+  /* ---------- схема потока ---------- */
+  .flow { display: flex; flex-direction: column; gap: .5rem; }
+  .flow-row { display: flex; align-items: stretch; gap: .5rem; flex-wrap: wrap; }
+  .node {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: clamp(.7rem, 1.6vh, 1.1rem) clamp(.8rem, 1.3vw, 1.2rem);
+    flex: 1 1 12rem;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+  }
+  .node .t { font-size: clamp(.9rem, 1.2vw, 1.1rem); color: var(--ink); font-weight: 620; }
+  .node .d { font-size: clamp(.78rem, 1vw, .93rem); color: var(--ink-3); line-height: 1.35; }
+  .node .tag { font-family: var(--mono); font-size: clamp(.58rem, .74vw, .68rem); letter-spacing: .12em; text-transform: uppercase; }
+  .node.n1 { border-top: 2px solid var(--water); } .node.n1 .tag { color: var(--water); }
+  .node.n2 { border-top: 2px solid var(--oil); }   .node.n2 .tag { color: var(--oil); }
+  .node.n3 { border-top: 2px solid var(--ink-3); } .node.n3 .tag { color: var(--ink-3); }
+
+  /* ---------- цитата ---------- */
+  blockquote {
+    margin: 0;
+    border-left: 3px solid var(--oil);
+    padding-left: clamp(.9rem, 1.6vw, 1.4rem);
+    font-family: var(--serif);
+    font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 52ch;
+  }
+  blockquote cite { display: block; margin-top: .6rem; font-family: var(--mono); font-style: normal; font-size: clamp(.68rem, .85vw, .78rem); color: var(--ink-3); letter-spacing: .06em; }
+
+  /* ---------- низ экрана ---------- */
+  .hud {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: clamp(2.6rem, 5vh, 3.4rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(1rem, 3vw, 2.4rem);
+    background: linear-gradient(to top, var(--ground) 55%, transparent);
+    font-family: var(--mono);
+    font-size: clamp(.65rem, .82vw, .76rem);
+    color: var(--ink-3);
+    letter-spacing: .08em;
+    z-index: 20;
+  }
+  .hud .where { color: var(--ink-3); }
+  .hud .count { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .hud button {
+    background: none;
+    border: 1px solid var(--line-hot);
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    padding: .25rem .6rem;
+    cursor: pointer;
+  }
+  .hud button:hover { color: var(--ink); border-color: var(--oil); }
+  .hud .grp { display: flex; gap: .4rem; align-items: center; }
+
+  .bar { position: fixed; left: 0; bottom: 0; height: 2px; background: var(--oil); z-index: 21; transition: width .18s ease; }
+
+  /* ---------- обзорная сетка ---------- */
+  .overview {
+    position: fixed;
+    inset: 0;
+    background: var(--ground);
+    z-index: 30;
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: .75rem;
+    padding: clamp(1.2rem, 3vw, 2.5rem);
+    overflow-y: auto;
+    align-content: start;
+  }
+  .overview.on { display: grid; }
+  .ov-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: .8rem .9rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+  }
+  .ov-card:hover, .ov-card:focus-visible { border-color: var(--oil); outline: none; }
+  .ov-card .n { font-family: var(--mono); font-size: .68rem; color: var(--oil); letter-spacing: .1em; }
+  .ov-card .t { font-size: .92rem; line-height: 1.3; color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide title-slide" data-title="Титул">
+    <div class="kicker">Хакатон AIOS<span class="sep">·</span>трек 2<span class="sep">·</span>чекпоинт 17.08.2026</div>
+    <h1>Мультиагентное управление<br>фондом скважин</h1>
+    <div class="rule-brass"></div>
+    <p class="sub">Model_Z: 103 скважины, 225 управляющих шагов, горизонт 18 лет. Цель — максимум ЧДД.</p>
+    <div class="title-meta">
+      Обоснование направления работы<br>
+      Что выбрано, почему именно так, чем это подтверждено на сегодня
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide" data-title="Как мы поняли задачу">
+    <div class="kicker">01<span class="sep">·</span>Постановка</div>
+    <h2>Как мы поняли задачу</h2>
+    <div class="body">
+      <p class="lead wide">Решить, что делать с каждой скважиной каждый месяц на 18 лет вперёд, чтобы месторождение принесло максимум дисконтированной прибыли.</p>
+      <div class="figs">
+        <div><span class="v">103</span><span class="k">скважины: добывающие и нагнетательные</span></div>
+        <div><span class="v">225</span><span class="k">управляющих шагов, 01.2007 — 09.2025</span></div>
+        <div><span class="v">~23 000</span><span class="k">решений в одном расписании</span></div>
+        <div><span class="v">5</span><span class="k">типов воздействия: открыть, закрыть, режим отбора, режим закачки, перевод под закачку</span></div>
+      </div>
+      <p class="wide">Часть фонда вводится в работу по ходу горизонта самой моделью — 22 скважины. Это данные месторождения, а не наши решения, и они переносятся в результат без изменений.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide" data-title="Ограничение задачи">
+    <div class="kicker">01<span class="sep">·</span>Постановка</div>
+    <h2>Почему задача не решается<br>прямым перебором</h2>
+    <div class="body">
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Замер, не оценка</span>
+          <p><strong>Один прогон гидродинамической модели — 513 секунд</strong> на свободной машине и до 1823 секунд, когда машина занята параллельными расчётами.</p>
+          <p>Проверить вариант расписания иначе нельзя: это единственный способ узнать, что ответит пласт.</p>
+        </div>
+        <div class="box dim">
+          <span class="lbl">Следствие</span>
+          <p>Тысяча вариантов — неделя непрерывного счёта. Осмысленный поиск в пространстве из 23 тысяч переменных требует десятков тысяч вариантов.</p>
+          <p><strong>Разрыв на четыре порядка.</strong> Это не вопрос железа.</p>
+        </div>
+      </div>
+      <p class="wide">Второе препятствие тоньше: даже при бесплатных прогонах 23 тысячи чисел не оптимизируются напрямую. Случайный поиск не находит ничего, эволюционные методы ломаются на сотнях измерений, градиентные не работают — целевая функция кусочно-постоянна из-за порогов и дискретных событий.</p>
+      <p class="lead">Отсюда обе половины конструкции: заменить дорогой прогон дешёвым предсказанием и заменить 23 тысячи чисел десятком.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide" data-title="Где в задаче деньги">
+    <div class="kicker">01<span class="sep">·</span>Постановка</div>
+    <h2>Где в этой задаче <span class="hl">деньги</span></h2>
+    <div class="body">
+      <p class="wide">Ставка дисконтирования 10% на горизонте 18 лет. Рубль 2007 года весит в 5.5 раза больше рубля 2025-го.</p>
+      <div class="figs">
+        <div><span class="v">58%</span><span class="k">всего ЧДД дают первые пять лет горизонта</span></div>
+        <div><span class="v">0.18</span><span class="k">коэффициент дисконтирования 2025 года</span></div>
+        <div><span class="v w">70%</span><span class="k">выручки уходит в отчисления — статья больше всех расходов вместе</span></div>
+        <div><span class="v w">×2</span><span class="k">вода штрафуется дважды: за подъём и за обратную закачку</span></div>
+      </div>
+      <div class="box cool">
+        <span class="lbl">Главное напряжение задачи</span>
+        <p>Добычу выгодно вытаскивать в ранние годы. Но форсирование ускоряет прорыв воды к скважине, и поздние годы умирают. При этом поздние годы стоят 18 копеек за рубль — значит граница выгодного размена проходит не там, где подсказывает интуиция. Найти её и есть содержание оптимизации.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide" data-title="Конструкция решения">
+    <div class="kicker">01<span class="sep">·</span>Постановка</div>
+    <h2>Конструкция решения</h2>
+    <div class="body">
+      <div class="flow">
+        <div class="flow-row">
+          <div class="node n1">
+            <span class="tag">Слой 1</span>
+            <span class="t">Суррогат</span>
+            <span class="d">Нейросеть предсказывает отклик пласта на расписание. Доли секунды вместо 15 минут. Снимает ограничение по числу вариантов.</span>
+          </div>
+          <div class="node n2">
+            <span class="tag">Слой 2</span>
+            <span class="t">Агенты и оптимизатор</span>
+            <span class="d">Три уровня агентов перебирают варианты на суррогате. Оптимизируются параметры правил, а не само расписание. Снимает ограничение по размерности.</span>
+          </div>
+          <div class="node n3">
+            <span class="tag">Слой 3</span>
+            <span class="t">Настоящий симулятор</span>
+            <span class="d">Лучшие кандидаты проверяются на реальной гидродинамике. Только это число заявляется.</span>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="node n2">
+            <span class="tag">Сквозной</span>
+            <span class="t">Калькулятор ЧДД</span>
+            <span class="d">Точная реализация Методики поверх отклика. Один и тот же для суррогата и для симулятора — обе ветви выдают одну и ту же величину.</span>
+          </div>
+          <div class="node n3">
+            <span class="tag">Сквозной</span>
+            <span class="t">Интерпретируемость</span>
+            <span class="d">Журнал сработавших правил, диагностика на языке промысла, объяснение решений языковой моделью.</span>
+          </div>
+        </div>
+      </div>
+      <div class="box hot">
+        <span class="lbl">Принцип, определивший всю архитектуру</span>
+        <p><strong>Нейросеть предсказывает физику. Деньги считаются точной формулой поверх её прогноза.</strong> Экономика детерминирована и проверяема — угадывать её нейросетью незачем. При таком разделении ошибка раскладывается на «ошибку физики» и «ошибку экономики» и диагностируется по отдельности.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · раздел -->
+  <section class="slide part" data-title="— Обоснование выбора —">
+    <div class="n">02</div>
+    <h1>Обоснование выбора</h1>
+    <p class="why">Шесть решений, определяющих систему. По каждому — что выбрано, почему и какая альтернатива отвергнута и на каком основании.</p>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide" data-title="Р1 · Правило вместо вектора">
+    <div class="kicker">02<span class="sep">·</span>Решение 1 из 6</div>
+    <h2>Оптимизируем <span class="hl">правило</span>,<br>а не расписание</h2>
+    <div class="body">
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Что сделано</span>
+          <p>Вместо 23 тысяч чисел подбирается <strong>не более 10 параметров</strong> у набора правил, которые смотрят на состояние скважины и решают, что с ней делать.</p>
+          <p>Критерий допуска правила в набор: оно формулируется одной фразой на языке промысла. Не формулируется — значит это замаскированный подгоночный коэффициент, и в набор он не входит.</p>
+        </div>
+        <div class="box dim">
+          <span class="lbl">Отвергнуто: прямая оптимизация вектора</span>
+          <p>Валидационный кейс мы не видели. Он придёт с другими ограничениями и другой историей разработки.</p>
+          <p>Вектор, вылизанный под базовый сценарий, привязан к конкретным датам и режимам. Правило смотрит на состояние — в новом кейсе состояние просто другое.</p>
+        </div>
+      </div>
+      <p class="wide">Два довеска получаются по построению: <strong>объяснимость</strong> — правило само есть объяснение, отдельный слой интерпретации поверх чёрного ящика не нужен; и <strong>масштабируемость</strong> — правило не знает, сколько на месторождении скважин.</p>
+      <div class="box warn">
+        <span class="lbl">Честный потолок, который называем сами</span>
+        <p>Правило не выразит всё, что выразит свободный вектор. Поэтому конструкция гибридная: правило строит основу, сверху возможна поправка на десяток скважин, где сосредоточены деньги.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide" data-title="Р2 · Связность измеряем">
+    <div class="kicker">02<span class="sep">·</span>Решение 2 из 6</div>
+    <h2>Связность скважин <span class="hl">измеряем</span> экспериментом,<br>а не берём по карте</h2>
+    <div class="body">
+      <blockquote>
+        Пространственная близость не означает гидродинамическую связь.
+        <cite>тезис заказчика, встреча 12.08</cite>
+      </blockquote>
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Как измеряем</span>
+          <p>Ортогональный план эксперимента (Плакетта—Бермана): половина нагнетательных на повышенный режим, половина на пониженный по матрице плана. Регрессия отклика на столбцы плана даёт чувствительность каждой пары.</p>
+          <p>Отклик считаем не по мгновенному дебиту, а по <strong>накопленной добыче в окне после воздействия, с перебором лага</strong> — задержка отклика здесь принципиальна.</p>
+        </div>
+        <div class="box dim">
+          <span class="lbl">Отвергнуто: выучить связность моделью</span>
+          <p>Обучаемые эмбеддинги с вниманием — это способ <em>выучить</em> связность. Мы её <em>измеряем</em>.</p>
+          <p>Агрегация по измеренной матрице делает ту же работу на порядок меньшими данными и не упирается в возражение «веса внимания не равны причинному влиянию».</p>
+        </div>
+      </div>
+      <div class="cols two">
+        <div class="box cool">
+          <span class="lbl">Матрица оконная, и это вынужденно</span>
+          <p>На 01.01.2007 нагнетательных <strong>27</strong>, а <strong>41</strong> набирается только к 2022. Матрица фиксированного размера на весь горизонт скрывала бы это несоответствие. Каждая матрица несёт свою область применимости по датам, дрейф связности становится измеримой разностью между окнами.</p>
+        </div>
+        <div class="box warn">
+          <span class="lbl">Цена метода, которую называем сами</span>
+          <p>План разделяет главные линейные эффекты за число прогонов порядка числа скважин. Взаимодействия и нелинейности при этом алиасируются в оценки. Это цена метода, а не дефект реализации.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide" data-title="Р3 · Три величины раздельно">
+    <div class="kicker">02<span class="sep">·</span>Решение 3 из 6</div>
+    <h2>Суррогат учит три величины раздельно,<br>а не дебит нефти напрямую</h2>
+    <div class="body">
+      <p class="lead wide"><code>нефть = жидкость × (1 − обводнённость)</code></p>
+      <p class="wide">Это произведение двух вещей с разным поведением. Обводнённость меняется медленно и предсказуемо — это память пласта. Дебит нефти скачет и от режима, и от обводнённости сразу, и модель не различает, какая причина сработала.</p>
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Почему обводнённость отдельно</span>
+          <p><strong>Обводнённость и есть источник денег.</strong> Вода штрафуется дважды: за подъём на поверхность и за обратную закачку. Величина, которая делает ЧДД, обязана иметь собственную метрику качества, а не получаться побочным продуктом.</p>
+        </div>
+        <div class="box warn">
+          <span class="lbl">Ловушка, которую это обходит</span>
+          <p>Обучение «управление → дебит» в лоб даёт модель, выучившую тождество «дебит равен заданной уставке». MAE будет отличный, а оптимизатор поверх скажет «поднять режим везде» и на настоящем симуляторе обвалит давление.</p>
+          <p><strong>Суррогат обязан моделировать недостижимость цели.</strong></p>
+        </div>
+      </div>
+      <div class="figs">
+        <div><span class="v">11 226</span><span class="k">недоборов цели на базовом прогоне — ловушка измерена, а не предполагается</span></div>
+        <div><span class="v">11 166</span><span class="k">из них — упор в предел по забойному давлению</span></div>
+        <div><span class="v w">0</span><span class="k">нарушений самих пределов давления: скважина просто не добирает режим</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" data-title="Р4 · Ранжирование вместо MAE">
+    <div class="kicker">02<span class="sep">·</span>Решение 4 из 6</div>
+    <h2>Метрика суррогата — <span class="hl">ранжирование</span>,<br>а не средняя ошибка</h2>
+    <div class="body">
+      <p class="wide">Оптимизатору не нужно абсолютное значение ЧДД: он потребляет только сравнение «вариант А лучше варианта Б». Абсолютное число берётся с настоящего симулятора на финальном прогоне — там, где оно единственно и требуется.</p>
+      <p class="wide">Ранжирующая постановка переживает систематическое смещение: константа, одинаково сдвигающая все сценарии, порядок не меняет.</p>
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Сдаваемый набор метрик</span>
+          <ul>
+            <li>ранговая корреляция по ЧДД;</li>
+            <li>precision@k и regret на верхушке списка — оптимизатору важен верх, а не весь порядок;</li>
+            <li>отдельная метрика по обводнённости;</li>
+            <li>ошибка по траекториям и доля предсказанных нарушений.</li>
+          </ul>
+        </div>
+        <div class="box cool">
+          <span class="lbl">Самооценка модели</span>
+          <p>Детектор выхода за обучающий диапазон строит область применимости по обучающей выборке и возвращает оценку выхода за неё <strong>вместе с каждым прогнозом</strong>. Кандидат вне области отбрасывается, а не оценивается.</p>
+          <p>Этот критерий назван вами критерием масштабируемости, но он не добавляет очков к ЧДД — поэтому его почти никто не строит.</p>
+        </div>
+      </div>
+      <p class="wide">MAE по дебитам в целевые метрики <strong>не входит</strong>.</p>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" data-title="Р5 · Устойчивость как ограничение">
+    <div class="kicker">02<span class="sep">·</span>Решение 5 из 6</div>
+    <h2>Устойчивость — <span class="hl">ограничение</span>,<br>а не слагаемое в цели</h2>
+    <div class="body">
+      <p class="wide">Оптимум бывает острый и пологий. На остром пике малое расхождение симуляторов сталкивает с него, и заявленное число разъезжается с проверочным. На плато расхождение почти не двигает результат.</p>
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Как меряем</span>
+          <p>Просадка ЧДД по батарее сценариев с разными ограничениями, относительно сценарного бейзлайна. Батарея разделена на отладочную и отложенную части, чтобы не подогнать правила под собственные сценарии.</p>
+        </div>
+        <div class="box dim">
+          <span class="lbl">Почему именно ограничение</span>
+          <p>Штраф добавил бы одиннадцатую подгоняемую ручку сверх лимита в десять и позволил оптимизатору разменивать устойчивость на доход. Ограничение такого размена не допускает по конструкции.</p>
+        </div>
+      </div>
+      <div class="box cool">
+        <span class="lbl">Что именно возмущаем</span>
+        <p>Условия кейса, а не параметры правил. Проверка придёт именно в терминах ограничений и истории — значит и возмущать надо ту ось, на которой реально будет проверка, а не ось поиска.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" data-title="Р6 · Иерархия агентов">
+    <div class="kicker">02<span class="sep">·</span>Решение 6 из 6</div>
+    <h2>Три уровня агентов,<br>участки — из измеренной связи</h2>
+    <div class="body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Уровень</th><th>Ответственность</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Менеджер месторождения</strong></td><td>общие лимиты: доступная вода, целевая компенсация по участкам, квоты</td></tr>
+            <tr><td><strong>Агенты участков</strong></td><td>оптимизация внутри выданного лимита на своей группе скважин</td></tr>
+            <tr><td><strong>Исполнители-скважины</strong></td><td>режим, включение и отключение, соблюдение физических ограничений</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cols two">
+        <div class="box dim">
+          <span class="lbl">Отвергнуто: агент на каждую скважину</span>
+          <p>Названо обречённым вами же, и по известным причинам: нестационарность среды с точки зрения каждого агента, невозможность назначить вклад в общий результат, вырождение в ленивого агента.</p>
+        </div>
+        <div class="box hot">
+          <span class="lbl">Восемь правил, три слоя</span>
+          <p><strong>R0</strong> порог рентабельности — выведен из Методики, параметров ноль. <strong>R1</strong> распределение закачки по предельной ценности. <strong>R2—R7</strong> подгоняемое: уровень отбора, гистерезис, порог насоса, компенсация, перевод под закачку, циклика.</p>
+          <p>Каждое правило включается и выключается флагом, каждое срабатывание пишется в журнал.</p>
+        </div>
+      </div>
+      <div class="box cool">
+        <span class="lbl">Дисциплина против разрастания</span>
+        <p>Отключаем правило, гоняем, смотрим падение ЧДД. Не упало — выкидываем. Без этого набор разрастётся до тридцати порогов, где никто не отличит осмысленное поведение от подогнанного. <strong>R7 сейчас реализовано и выключено:</strong> выгода не подтверждена данными, а остановка и запуск стоят по миллиону рублей.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · раздел -->
+  <section class="slide part" data-title="— Чем подтверждено —">
+    <div class="n">03</div>
+    <h1>Чем подтверждено<br>на сегодня</h1>
+    <p class="why">Всё ниже получено запуском на текущем коде. Замеры по симулятору — настоящие прогоны Model_Z, не оценки.</p>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide" data-title="Схождение с эталоном">
+    <div class="kicker">03<span class="sep">·</span>Подтверждение</div>
+    <h2>Схождение с вашим расчётчиком<br>доведено до <span class="hl">машинного нуля</span></h2>
+    <div class="body">
+      <p class="wide">Вы выложили код расчёта ЧДД — тот самый, которым будете считать при оценке. Значит расхождение с ним не предмет спора, а наш дефект по определению. Мы сделали схождение не разовой сверкой, а постоянной приёмкой в тестах.</p>
+      <div class="figs">
+        <div><span class="v">1.49e-08</span><span class="k">руб расхождения при ЧДД 5.41e7 руб — предел точности вещественных чисел</span></div>
+        <div><span class="v">11</span><span class="k">сценариев сравниваются постатейно, а не по итоговому числу</span></div>
+        <div><span class="v w">1 553 298</span><span class="k">байт: разбор и обратная сборка расписания восстанавливают файл байт в байт</span></div>
+        <div><span class="v w">1131</span><span class="k">зелёный тест на текущем коде</span></div>
+      </div>
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Что именно сравнивается</span>
+          <p>Выручка, отчисления, OPEX по каждой статье, налог на имущество, налог на прибыль, EBITDA, FCF, дисконт. Плюс внешняя сверка на <strong>ваших данных, загруженных вашим же кодом</strong>, а не на наших синтетических рядах.</p>
+        </div>
+        <div class="box cool">
+          <span class="lbl">Негативный контроль</span>
+          <p>Отдельный тест внедряет искусственное расхождение и проверяет, что сравнение его ловит. Без него зелёный отчёт о схождении не доказывал бы ничего.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section class="slide" data-title="Экономика базового сценария">
+    <div class="kicker">03<span class="sep">·</span>Подтверждение</div>
+    <h2>Экономика базового сценария<br>посчитана и разложена</h2>
+    <div class="body">
+      <p class="wide">Первое защитимое число проекта: <strong>около 11.9 млрд руб ЧДД</strong> на настоящем прогоне OPM, 103 скважины, 371 отчётная дата, 224 месячных интервала. Синтетики нет.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Статья за горизонт</th><th>Млн руб</th><th>Что это значит</th></tr></thead>
+          <tbody>
+            <tr><td>Выручка</td><td class="num">102 491</td><td></td></tr>
+            <tr><td>Отчисления</td><td class="num">71 744</td><td>70% выручки, больше всех расходов вместе взятых</td></tr>
+            <tr><td>OPEX всего</td><td class="num">3 333</td><td>жидкость 904, содержание фонда 1 795, закачка 350</td></tr>
+            <tr><td>EBITDA</td><td class="num">27 415</td><td></td></tr>
+            <tr><td>Налог на прибыль</td><td class="num">6 854</td><td>25%, считается на годовой базе</td></tr>
+            <tr><td>CAPEX на насосы</td><td class="num">27</td><td>0.1% расходной части — здесь денег нет</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Находка, меняющая правила оптимизации</span>
+        <p>До налога убыточны <strong>34 скважины</strong>, но <strong>33 из них — чисто нагнетательные</strong>: несут расходы на закачку и содержание при нулевой выручке, а окупаются через давление в добывающих. Наивный оптимизатор, глушащий скважины по признаку отрицательного вклада, убил бы систему поддержания давления и обвалил всю добычу. Единственный настоящий убыточный добывающий на базе — скважина 24.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide" data-title="Базовая линия и ловушки данных">
+    <div class="kicker">03<span class="sep">·</span>Подтверждение</div>
+    <h2>Базовая линия измерена,<br>ловушки в данных найдены</h2>
+    <div class="body">
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Порог, который модель обязана побить</span>
+          <p>Классическая модель CRM обучена на настоящем отклике. На отложенной части временной оси: <strong>R² 0.948</strong>, ранговая корреляция 0.979, медианная ошибка 4.9%. Подгонка 8 секунд.</p>
+          <p>Оговорка, которую делаем сами: это перенос во времени при одной программе закачки, а не перенос между сценариями. Оптимизатору нужен второй.</p>
+        </div>
+        <div class="box cool">
+          <span class="lbl">Результат, стоящий отдельного упоминания</span>
+          <p>Свободная подгонка даёт R² 0.99 на обучении при <strong>−5.3 на отложенной части</strong> — чистое запоминание. Ограничение знака коэффициентов и материальный баланс оказались несущими, а не косметическими, и накладываются в ходе подгонки, а не после.</p>
+        </div>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Четыре ловушки в данных, каждая даёт правдоподобный неверный результат без единой ошибки</span>
+        <ul>
+          <li><strong>Две шкалы времени.</strong> 371 отчётная дата в модели, 225 управляющих, и только 224 замкнутых месячных интервала — у последней даты нет следующей.</li>
+          <li><strong>Расписание из двух слоёв.</strong> Внутри горизонта лежат 25 блоков заканчивания, изменение проводимости и ввод 22 скважин. Парсер, считающий управляемым весь текст после начала горизонта, выдаёт файл, который посчитает другое месторождение.</li>
+          <li><strong>Накопленные величины дифференцируются внутри скважины.</strong> Глобальная разность переносит накопленное через границу скважин.</li>
+          <li><strong>23 из 103 скважин вскрывают два региона по свойствам флюида.</strong> Одна плотность на скважину даёт систематическую ошибку в массе, а масса — это выручка.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 · раздел -->
+  <section class="slide part" data-title="— Статус и план —">
+    <div class="n">04</div>
+    <h1>Честный статус<br>и план до сдачи</h1>
+    <p class="why">Что готово, чего нет и сколько стоит доделать. Заглушек не ставили: компонент, который не может посчитать, падает с ошибкой, а не возвращает ноль.</p>
+  </section>
+
+  <!-- 18 -->
+  <section class="slide" data-title="Что готово и чего нет">
+    <div class="kicker">04<span class="sep">·</span>Статус</div>
+    <h2>Что готово и чего нет</h2>
+    <div class="body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Контур</th><th>Статус</th><th>Комментарий</th></tr></thead>
+          <tbody>
+            <tr><td>Расписание: разбор, сборка, валидация</td><td><span class="chip ok">готово</span></td><td>round-trip байт в байт</td></tr>
+            <tr><td>Экономика и ЧДД</td><td><span class="chip ok">готово</span></td><td>сходится с эталоном до машинного нуля</td></tr>
+            <tr><td>Мост к симулятору, генератор датасета</td><td><span class="chip ok">готово</span></td><td>базовый прогон выполнен, кеш работает</td></tr>
+            <tr><td>Связность, участки, правила, иерархия</td><td><span class="chip ok">готово</span></td><td>восемь правил, журнал решений</td></tr>
+            <tr><td>Оптимизатор, устойчивость, внешний цикл</td><td><span class="chip ok">готово</span></td><td>CMA-ES, батарея сценариев, regret</td></tr>
+            <tr><td>Интерфейс и слой интерпретируемости</td><td><span class="chip ok">готово</span></td><td>собирается в production</td></tr>
+            <tr><td><strong>Обученная модель суррогата</strong></td><td><span class="chip no">нет</span></td><td>вся обвязка написана; не хватает данных — 200–400 прогонов, это 7–14 часов счёта</td></tr>
+            <tr><td><strong>Собственное расписание</strong></td><td><span class="chip mid">ближайший шаг</span></td><td>посчитан базовый сценарий; своё улучшенное ещё не порождали</td></tr>
+            <tr><td><strong>Формат сдаваемого файла</strong></td><td><span class="chip mid">ждём вас</span></td><td>синтаксис не подтверждён, реализация до ответа была бы угадыванием</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box hot">
+        <span class="lbl">Приоритет, который мы выбрали сознательно</span>
+        <p>Мы вложились сначала в то, что нельзя проверить в последний день: в точность денег и в корректность работы с данными месторождения. Модель ещё учится — реализована обвязка и посчитана базовая линия, которую она обязана побить.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section class="slide" data-title="План до сдачи">
+    <div class="kicker">04<span class="sep">·</span>План</div>
+    <h2>План до 11 сентября</h2>
+    <div class="body">
+      <div class="flow">
+        <div class="flow-row">
+          <div class="node n2">
+            <span class="tag">Шаг 1 · дни</span>
+            <span class="t">Замкнуть контур без суррогата</span>
+            <span class="d">Прокрутить правила на состоянии базового отклика, получить своё расписание, проверить одним прогоном симулятора. Даёт первое число вида «правила дают +X% к базе» — и это настоящая проверка направления.</span>
+          </div>
+          <div class="node n1">
+            <span class="tag">Шаг 2 · сутки счёта</span>
+            <span class="t">Добрать датасет</span>
+            <span class="d">200–400 полных прогонов, 7–14 часов при четырёх потоках. Кеш ключуется хешами, ни один посчитанный прогон не повторяется, объём добирается партиями.</span>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="node n1">
+            <span class="tag">Шаг 3</span>
+            <span class="t">Обучить и принять модель</span>
+            <span class="d">Три величины раздельно, приёмка готовыми метриками. Порог: побить CRM по ранговой корреляции, иначе модель отвергается.</span>
+          </div>
+          <div class="node n2">
+            <span class="tag">Шаг 4</span>
+            <span class="t">Оптимизация и верификация</span>
+            <span class="d">CMA-ES по десяти параметрам, отбор кандидатов, внешний цикл проверки настоящей гидродинамикой.</span>
+          </div>
+          <div class="node n3">
+            <span class="tag">Шаг 5</span>
+            <span class="t">Финальная сдача</span>
+            <span class="d">Оба валидатора, финальный прогон, заявленное число с полной цепочкой хешей от расписания до результата.</span>
+          </div>
+        </div>
+      </div>
+      <div class="box warn">
+        <span class="lbl">Риск, который видим сами</span>
+        <p>Критический путь последовательный: датасет → обучение → калибровка → финальный тракт. Каждое звено ждёт предыдущего. Поэтому шаг 1 вынесен вперёд и суррогата не требует: он даёт проверку направления результатом уже на этой неделе, независимо от того, как пойдёт обучение.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 20 -->
+  <section class="slide" data-title="Вопросы к экспертам">
+    <div class="kicker">04<span class="sep">·</span>Обратная связь</div>
+    <h2>Что мы хотим услышать от вас</h2>
+    <div class="body">
+      <div class="cols two">
+        <div class="box hot">
+          <span class="lbl">Вопрос 1 · блокирует работу</span>
+          <p><strong>Точный синтаксис сдаваемого файла расписания.</strong> Включает ли он историю и фиксированный слой данных месторождения? Реализация до ответа была бы угадыванием, поэтому эта задача у нас заблокирована.</p>
+        </div>
+        <div class="box hot">
+          <span class="lbl">Вопрос 2 · арифметика допуска</span>
+          <p><strong>«Пара процентов» — от какой величины и в какую сторону?</strong> Допуск один на разницу симуляторов и на нашу ошибку в экономике; знать его точную форму нужно, чтобы правильно распределить бюджет ошибки.</p>
+        </div>
+      </div>
+      <div class="cols two">
+        <div class="box cool">
+          <span class="lbl">Вопрос 3 · оценка</span>
+          <p><strong>Как читается отсутствие обученной нейросети,</strong> если есть работающая базовая линия, вся обвязка и детектор выхода за обучающий диапазон? Формально суррогат необязателен — уточните, как это учитывается при отборе.</p>
+        </div>
+        <div class="box cool">
+          <span class="lbl">Вопрос 4 · устойчивость</span>
+          <p><strong>Что вы считаете достаточной устойчивостью?</strong> Порог допустимой просадки по сценариям мы сейчас назначаем себе сами, вашего ориентира у нас нет.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section class="slide title-slide" data-title="Итог">
+    <div class="kicker">Итог</div>
+    <h1>Направление<br>в одном абзаце</h1>
+    <div class="rule-brass"></div>
+    <p class="sub" style="max-width:60ch">Связность скважин измеряем экспериментом, а не берём по карте. Оптимизируем правило, переносимое на невиданный кейс, а не вектор под базовый сценарий. Нейросеть предсказывает физику, деньги считаются точной формулой поверх — и она уже сходится с вашим расчётчиком до машинного нуля. Настоящий симулятор проверяет финалистов, и только его число заявляется.</p>
+    <div class="title-meta">
+      Модель ещё учится. Всё, что можно проверить без неё, проверено.
+    </div>
+  </section>
+
+</div>
+
+<div class="bar" id="bar"></div>
+
+<div class="hud">
+  <span class="where" id="where"></span>
+  <span class="grp">
+    <button type="button" id="prev" aria-label="Назад">←</button>
+    <button type="button" id="next" aria-label="Вперёд">→</button>
+    <button type="button" id="grid">Все слайды · O</button>
+    <span class="count" id="count"></span>
+  </span>
+</div>
+
+<div class="overview" id="overview" role="dialog" aria-label="Все слайды"></div>
+
+<script>
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var bar = document.getElementById('bar');
+  var where = document.getElementById('where');
+  var count = document.getElementById('count');
+  var overview = document.getElementById('overview');
+  var i = 0;
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    where.textContent = slides[i].getAttribute('data-title') || '';
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    slides[i].scrollTop = 0;
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  function toggleOverview(force) {
+    var on = typeof force === 'boolean' ? force : !overview.classList.contains('on');
+    overview.classList.toggle('on', on);
+  }
+
+  slides.forEach(function (s, k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ov-card';
+    b.innerHTML = '<span class="n">' + String(k + 1).padStart(2, '0') + '</span><span class="t"></span>';
+    b.querySelector('.t').textContent = s.getAttribute('data-title') || '';
+    b.addEventListener('click', function () { show(k); toggleOverview(false); });
+    overview.appendChild(b);
+  });
+
+  document.getElementById('prev').addEventListener('click', function () { show(i - 1); });
+  document.getElementById('next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('grid').addEventListener('click', function () { toggleOverview(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); toggleOverview(false); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); toggleOverview(false); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+    else if (e.key === 'o' || e.key === 'O' || e.key === 'щ' || e.key === 'Щ') { toggleOverview(); }
+    else if (e.key === 'Escape') { toggleOverview(false); }
+  });
+
+  var start = parseInt((location.hash || '').slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1);
+</script>
+
+</body>
+</html>
