@@ -15,7 +15,9 @@ from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+# tools/ лежит внутри context/, данные организаторов — в корне docs:
+# check_deck_facts.py -> tools -> context -> docs
+ROOT = Path(__file__).resolve().parent.parent.parent
 DECK = ROOT / "models" / "Model_Z" / "Model_Z.data"
 SCH = ROOT / "models" / "Model_Z" / "Model_Z_sch.inc"
 REGS = ROOT / "models" / "Model_Z" / "Model_Z_regs.inc"
