@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|
 | G1 | Паритет эталона на настоящей Model_Z | Савелий | — | `economics/` | 0.5 дня | готово 20.08 · c49173a |
 | G2 | Один канон хеша и один порядок оси скважин | Савелий | — | `contracts/`, `schedule/` | 1 день | готово 20.08 · f4a3cf8 |
-| G3 | Реальный `RunArtifact` вместо синтетики | Михаил | — | `ui/`, `frontend/public/data` | 0.5 дня | |
+| G3 | Реальный `RunArtifact` вместо синтетики | Михаил | — | `ui/`, `frontend/public/data` | 0.5 дня | готово 20.08 · 24532fa |
 | G4 | Гейт суррогата против CRM и слияние ветки | Андрей | — | `surrogate/` | 1 день | |
 | G5 | Первый собственный `Schedule*` | Андрей | G4 | `optimizer/`, `policy/` | 1–2 дня | |
 | G6 | Тракт задачи 62, звено А | Андрей | G2 | `bridge/` | 2–3 дня | |
@@ -85,6 +85,16 @@
 **Что сделать.** Собрать `RunArtifact` из локального базового прогона (`dataset-700/base_run`) средствами `ui/` и положить в `frontend/public/data`. Оси берутся из артефакта, не из литералов. Демонстрационный бандл сохраняется отдельным сценарием библиотеки и остаётся помеченным.
 
 **Приёмка.** Тест: в собранном бандле `synthetic` равно `false`, `npv_methodology` совпадает со значением из расчёта на базовом отклике, число скважин и шагов взято из данных. Фронт открывается без `SyntheticBanner` на основном сценарии.
+
+**Сделано, 20.08.** Новый `ui/base_artifact.py::build_base_artifact` собирает `RunArtifact` сценария `base` из `aios/data/base_case/response.json` (задача G1) через `economics.analyze_base_case` — `schedule`, `npv_table`, `state_at_date`/`interval_response` настоящие, `provenance="model-z-base-run"`, `synthetic=false` вместо `"synthetic-demo"` с ЧДД 141 177 руб. `whatif-injection-cut` остаётся демо-библиотекой, честно помеченной. `SyntheticBanner`/`ProvenanceContext` во фронте правки не потребовали — уже читают `meta.synthetic`/`meta.provenance` из данных. `frontend/public/data` не в git (`frontend/.gitignore`), коммитится только код-генератор.
+
+**Отступление от карточки — groups/λ.** Настоящую связность (`groups`/`lambda_`) из одного базового прогона честно не посчитать: нужна серия экспериментов с отклонениями закачки (`connectivity`, ортогональный план), которой нет. Заполнено тривиальной, но не фиктивной заглушкой — одна группа на весь фонд, нулевая матрица влияния правильной формы, хеши настоящие (`connectivity.groups.lambda_hash`/`group_hash`), помечено в докстринге `ui/base_artifact.py`. Не выдаётся за измерение.
+
+**Отступление от карточки — `final_npv` не заполнен.** `FinalNpvArtifact` — «единственный разрешённый источник заявленного числа» (README §6a), подразумевает прохождение полного тракта сдачи (задача 62/G6: `validate_static → OpmDeckEmitter → Runner → status==OK → ResponseLoader → validate_dynamic → Economics → FinalNpvArtifact`, шесть тождеств хешей §10.5). Тракта ещё нет, поэтому `scenarios.json` показывает `submitted: null` для обоих сценариев — заполнять `final_npv` сейчас значило бы заявлять то, что не проверено тем же классом ошибки, что и `synthetic-demo`.
+
+**Что осталось после G6.** Когда тракт задачи 62 появится (G6/G7), `build_base_artifact` — кандидат на замену источником `FinalNpvArtifact` из настоящего прогона, и `groups`/`lambda_` — на замену реальной оценкой связности, когда появится серия экспериментов.
+
+Новые тесты: `ui/tests/test_base_artifact.py` (приёмка дословно), `ui/tests/test_demo.py` — раздельная разметка `base`(реальный)/`whatif`(демо).
 
 ---
 
