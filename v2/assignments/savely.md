@@ -1,6 +1,6 @@
 # Савелий — интегратор, расписание и деньги
 
-> Карточка второй версии. Одноимённый файл в `../../v1/assignments/` — архив первой: 65 закрытых задач, планом работ не является.
+> Карточка второй версии. Одноимённая карточка первой версии — в архиве, теге `docs-v1` (`git show docs-v1:v1/assignments/order.md`): 65 закрытых задач, планом работ не является.
 
 Каталоги: `contracts/`, `schedule/`, `economics/`, `config/`, `ui/`, `llm/`, корневые файлы (`Dockerfile`, `docker-compose.yml`, `README.md`).
 
@@ -28,4 +28,4 @@
 
 ## Что читать
 
-`aios/contracts/README.md` целиком, `../../context/08_contracts.md` §2–§3 и §10.5, `../../context/07_concept.md` §5. Архив первой версии — `../../v1/`, туда только за историей решения.
+`aios/contracts/README.md` целиком, `../../context/08_contracts.md` §2–§3 и §10.5, `../../context/07_concept.md` §5. Архив первой версии — тег `docs-v1` (`git show docs-v1:v1/README.md`), туда только за историей решения.
