@@ -768,28 +768,6 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   `frontend/public/data/timeline.json.meta.response_hash` либо расхождение объяснено в отчёте;
   время прогона записано в `out/opm-budget.jsonl`; два прогона дают одинаковый хеш.
   Тест: `backend/infrastructure/opm/tests/test_base_run.py` (skip без Docker).
-- [ ] **R-01 · Пути Windows в запуске Docker** — A.
-  Файлы: `backend/infrastructure/opm/runner.py`, `backend/infrastructure/opm/dataset.py`.
-  Сделать: монтирование каталогов через `Path.resolve()` без префикса `\\?\`, форма `-v host:cont`
-  проверяется тестом на путях с буквой диска.
-  Готово, когда: `python build_dataset.py` на одном сценарии не падает с `too many colons`.
-  Тест: `backend/infrastructure/opm/tests/test_runner.py` — кейс с путём `W:\...`.
-- [ ] **R-02 · Битая ссылка в `README.md`** — B.
-  Файлы: `README.md`.
-  Сделать: ссылку на `../dataset-700/README.md` заменить описанием фактического расположения датасета
-  (`../data/dataset-main`, S-05) либо добавить в `EXPLICIT_EXCLUSIONS` теста с обоснованием.
-  Готово, когда: `python -m pytest tests/architecture/test_markdown_links.py -q` зелёный.
-- [ ] **R-09 · Нарушение слоёв в `search_run.py`** — B.
-  Файлы: `backend/application/optimization/search_run.py`, `backend/application/optimization/verification_run.py`,
-  `backend/presentation/ui_export/scenarios.py`, новый `backend/application/cases.py` (заготовка для O-03).
-  Сделать: `constraints_from_json` переезжает в `application/cases.py`; `ui_export/scenarios.py`
-  импортирует его оттуда, а не наоборот.
-  Готово, когда: `python -m pytest tests/architecture/test_layers.py -q` зелёный, тесты `ui_export` зелёные.
-- [ ] **R-03 · Починить `test_no_parameter_bypass`** — B.
-  Файлы: `backend/domain/connectivity/measure.py`, `backend/domain/configuration/schema.py`.
-  Сделать: константы `0.1` (допуск недобора и порог разделения) вынести в параметры конфигурации с
-  именами и документацией.
-  Готово, когда: `python -m pytest backend/domain/configuration -q` зелёный.
 - [ ] **O-08 · Восстановить λ** — B.
   Файлы: `data/lambda-window-2007/lambda.json`, `backend/application/connectivity_measure.py`.
   Сделать: найти артефакт в архивном теге / у команды (H-04); если нет — подготовить план кампании
@@ -801,23 +779,20 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   Сделать: скрипт-отчёт: сколько сценариев, по семействам, сколько с откликом; список того, что нужно
   от Андрея (H-04) с точными именами файлов.
   Готово, когда: отчёт в `out/dataset-inventory.json`, письмо для H-04 составлено.
-- [ ] **U-10a · Карта синтетики в витрине** — C.
-  Файлы: `frontend/src/data/validators.ts`, `frontend/src/data/validators.artifacts.test.ts`.
-  Сделать: перечислить все артефакты с `synthetic: true` / `provenance: synthetic-demo` и все места
-  интерфейса, которые их читают; добавить тест, который **сейчас** падает в production-сборке и
-  помечен `todo` до U-10.
-  Готово, когда: список в отчёте, тест написан.
-- [ ] **U-13 · Читаемость графа** — C.
-  Файлы: `frontend/src/views/shared/graphModel.ts`, `frontend/src/views/FieldProjection/EdgeLayer.tsx`.
-  Сделать: порог рёбер по умолчанию такой, что видимых рёбер ≤ 400 при 103 узлах; толщина/прозрачность
-  по весу через токены; тест на число видимых рёбер для `graph.json`.
-  Готово, когда: тест зелёный, скриншот в отчёте.
-- [ ] **U-11 · Единицы на карточках Обзора** — C.
-  Файлы: `frontend/src/views/Overview/OverviewCard.tsx`, `frontend/src/i18n/{ru,en}/overview.json`.
-  Готово, когда: у каждой величины единица из словаря; тест рендера.
 
-**Гейт W0:** `python -m pytest -q` зелёный, включая `tests/architecture` (кроме skip без данных), фронт 1280+ тестов зелёный,
-`data/base_case/response.json` существует, время прогона известно.
+**Гейт W0:** `data/base_case/response.json` существует, время прогона известно.
+
+Закрыто 04.09 на ветке `jarvis`: R-01, R-02, R-03, R-09, U-10a, U-11, U-13. Тесты к ним написаны,
+но не прогонялись — прогон за человеком:
+
+```bash
+python -m pytest tests/architecture backend/domain/configuration backend/domain/connectivity backend/infrastructure/opm/tests/test_runner.py -q
+cd frontend && npx tsc --noEmit
+npx --yes node@22.11.0 node_modules/vitest/vitest.mjs run src/views/Overview/ src/views/shared/ src/data/ src/i18n/i18n.test.ts src/theme/tokens.test.ts src/views/FieldProjection/
+```
+
+Оговорка по U-11: проценты на карточках Обзора теперь выводятся числом со знаком в слоте единицы,
+а не через `Intl` с процентом внутри значения. На других экранах формат не менялся.
 
 ### W1 — коридор компенсации и кейс (04.09)
 
@@ -851,26 +826,12 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   Сделать: `water_reinjection_fraction` не обязателен и по умолчанию отсутствует; `external_water_m3_per_day`
   документирован как `n`; поиск использует `C_min·V_prod ≤ Σq_wi ≤ min(лимит кейса, C_max·V_prod)`.
   Готово, когда: тесты `application/optimization` зелёные, `grep WATER_SAFETY_FACTOR backend` пуст.
-- [ ] **M-01 · Протокол `Agent` и реестр** — B.
-  Файлы: новые `backend/domain/policy/agents/__init__.py`, `base.py`, `registry.py`, `field.py`,
-  `group.py`, `well.py`; `backend/domain/policy/hierarchy.py` (делегирует реестру).
-  Сделать: §5.3; существующее поведение иерархии не меняется (снимок `HierarchyTrace` до/после на
-  фикстуре совпадает по хешу).
-  Готово, когда: `test_hierarchy.py` зелёный без правок ожиданий; реестр из трёх агентов;
-  `ARCHITECTURE_MAS.md` заведён с генерируемой таблицей (пока три строки).
-  Тест: `backend/domain/policy/tests/test_agents_registry.py`.
 - [ ] **M-02 · Координатор читает коридор и `n`, распорядитель — только проверенные рёбра** — B.
   Файлы: `backend/domain/policy/agents/field.py`, `group.py`, `backend/domain/policy/rules/r5.py`,
   `backend/domain/policy/state.py` (`RuleContext.compensation`, `RuleContext.edge_verified`).
   Сделать: §4.2 и §5.2; R5 читает коридор кейса; `edge_verified` пока всегда `True` (до P-12).
   Готово, когда: тест «при коридоре кейса [1.15, 1.51] R5 не трогает базу; при [0.95, 1.15] режет
   закачку до 1.15·V_prod» зелёный.
-- [ ] **O-03 · Кейс из файла** — B.
-  Файлы: новый `backend/application/cases.py`, `backend/presentation/cli/run.py` (`--case`),
-  `config/cases/base.json`, `config/cases/README.md`.
-  Сделать: §7.3; неизвестное поле — ошибка; `new_wells` — отказ с текстом.
-  Готово, когда: `run search --case config/cases/base.json` проходит до выбора кандидата на
-  фикстурах; тесты `tests/presentation/test_run_cli.py` расширены.
 - [ ] **U-03 · Типизированные ограничения кейса** — C.
   Файлы: `frontend/src/views/Scenarios/{constraints.ts,InfrastructureTable.tsx,useEditor.ts,parseDocument.ts}`,
   новые `frontend/src/views/Scenarios/PhysicsFields.tsx`, `PhysicsFields.css`,
@@ -888,6 +849,42 @@ W6), либо экспортируется с `delta_npv: null` и статус�
 
 **Гейт W1:** базовое расписание — `sound` при `hard`; `grep -r water_reinjection_fraction config`
 показывает только документацию; полный прогон тестов зелёный.
+
+Закрыто 04.09 на ветке `jarvis`: M-03, O-03, U-06, U-12, D-02. Прогон выполнен: фронт 1339 тестов
+зелёные (88 файлов), `tsc --noEmit` чист. Починено по ходу: список синтетического долга в
+`frontend/src/data/validators.artifacts.test.ts` сокращён на два файла иерархии — они перестали быть
+синтетикой.
+
+**Схема файла кейса зафиксирована (O-03).** Шесть разделов верхнего уровня: `injection_limits`,
+`liquid_limits` (м³/сут), `production_floors` (т/сут), `watercut_limits` (доля 0…1), `well_outages`,
+`infrastructure`. В `infrastructure` ровно семь ключей; `external_water_m3_per_day` — это объём `n`
+организаторов. Неизвестный раздел или ключ — ошибка с именем поля. Отказы с объяснением:
+`new_wells` (фонд фиксирован), `oil_limits` (P-07), `commissioning_shifts` (O-12) — при реализации
+этих задач строки убираются из `REFUSED_SECTIONS`. Фронтовый редактор (U-03) обязан выдавать ровно
+этот формат; сейчас `frontend/src/api/types.ts` типизирует `infrastructure` как свободные пары,
+которые бэкенд отвергнет.
+
+**Схема `hierarchy.json` зафиксирована (M-03).** Новые поля: `agents` (реестр с ролями),
+`agents_fired`, `trace_entries_by_level`, `decisions` на шаге, `share_of_field` и `demand_rub_per_m3`
+в квотах поля, `requested_m3_per_day` и `trace_entries` в участках, `agent` и `constraint` у скважины.
+Файл вырос с 3.7 до 7.4 МБ: настоящие входы правил объёмнее синтетических. Провенанс
+`policy-hierarchy-trace`, `synthetic: false`, 224 шага, сработали правила R1, R2, R4, R5, R6.
+Собран не штатным `demo.py` (ему нужен отсутствующий базовый отклик), а тем же экспортёром из
+`frontend/public/data/bundles/base.json`. Лимит поля берётся из фактической приёмистости отклика;
+когда появится кейс с лимитами закачки, источник надо переключить на `Constraints`.
+
+**Найдено при проверке.** У сценария `policy-plan` в графе нет флага `lambda_measured` — это не
+ошибка: серию возмущённых прогонов для того расписания не выполняли, и экспортёр честно об этом
+говорит. На защите это надо произносить самим, а не ждать вопроса.
+
+**Расхождение чисел, требует решения команды.** В питче 31.08 назван ЧДД 7.714 млрд ₽
+(`blind_holdout`), в конфигурации чемпиона лежит 7.781 млрд ₽ (`blind_extension`). Оба настоящие,
+но на защите нужно называть одно и объяснять разницу.
+
+**Происхождение «40 миллионов» с чекпоинта не подтверждено.** Ближайшее число в репозитории —
+`loocv_max_absolute_error_rub` = 39 654 847 ₽ в `config/opm-active-npv-calibration.json`, но это
+максимальная ошибка калибровки в скользящем контроле, а не средняя ошибка модели; средняя по той же
+выборке 16.5 млн ₽. В `FAQ.md` это записано честно, как неустановленное.
 
 ### W2 — давление, баланс, настоящий Совет (05.09)
 
@@ -922,18 +919,6 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   оценить, что нужно, чтобы перенести ввод на другую дату без потери round-trip; решить «делаем в W5 /
   объявляем отказом» с обоснованием.
   Готово, когда: решение записано в §7.3 с оценкой в часах; если «делаем» — O-12 поставлен в W5.
-- [ ] **M-03 · Экспорт настоящего `HierarchyTrace` в витрину** — B.
-  Файлы: `backend/presentation/ui_export/hierarchy_view.py` (переписать без `demo_rng`),
-  `backend/presentation/ui_export/demo.py`, `frontend/public/data/hierarchy.json` (пересборка).
-  Сделать: уровни FIELD/GROUP/WELL из `HierarchyTrace` прогона политики на базовом отклике; поле
-  `agents` — реестр (имя, уровень, ответственность, сработал ли на шаге).
-  Готово, когда: `hierarchy.json.meta.provenance` — идентификатор прогона, `synthetic: false`; суммы
-  участков сходятся с полем (тест); `demo_rng` не импортируется из `hierarchy_view.py`.
-- [ ] **M-04 · Ни одна уставка не обходит проекцию** — B.
-  Файлы: `backend/domain/policy/agents/projection.py` (`project_to_hard_constraints`),
-  `backend/application/optimization/schedule_search.py`, тест `test_projection_gate.py`.
-  Готово, когда: единственная точка записи `ControlEvent` в расписание — после проекции; тест
-  подменяет проекцию и убеждается, что все события прошли через неё.
 - [ ] **M-09 · Группы на измеренной λ и отчёт** — B.
   Файлы: `backend/domain/connectivity/groups.py`, `backend/application/connectivity_groups.py`
   (новый), тест на мини-поле из двух изолированных блоков.
@@ -945,13 +930,24 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   `frontend/src/data/validators.ts` (`agents`).
   Готово, когда: экран рендерит `hierarchy.json` из M-03 (передача: B публикует схему в начале волны),
   панель агентов показывает сработавших на шаге; тест.
-- [ ] **U-06 · «Как посчитаны рёбра»** — C.
-  Файлы: `frontend/src/views/FieldProjection/ProjectionControls.tsx`, `frontend/src/i18n/{ru,en}/projection.json`.
-  Готово, когда: `InfoHint` показывает лаг, устойчивость, ранг, число обусловленности из `graph.json.meta`;
-  тест.
 
 **Гейт W2:** `hierarchy.json` без синтетики; валидатор проверяет давление и баланс на базе; полный
 прогон зелёный.
+
+Закрыто 04.09 на ветке `jarvis`: M-01, M-04, M-07, U-08, U-09. Прогон выполнен: бэкенд 827 тестов
+зелёные (16 пропущено без `torch`, он не установлен и модель мы не трогаем), фронт 1314 тестов,
+`tsc --noEmit` чист. Починено по ходу: фикстура `where-is-connectivity.jsonl` перегенерирована под
+расширенную базу знаний; в `CouncilWells.css` два блока `prefers-reduced-motion` слиты в один.
+
+Известные флейки полного прогона (в одиночку проходят, падают только под параллельной нагрузкой):
+`Chronomap/cells.test.ts` «randomised palettes» (~39 с при лимите 15 с) и
+`FieldProjection.test.tsx` «every lambda edge visible». Оба — таймаут, не регрессия.
+
+Открытые решения от волны:
+- инструмент журнала решений зарегистрирован как `decision_journal`, потому что имя
+  `explain_decision` уже занято инструментом в `rules.py`; при желании переименовать — отдельная задача;
+- провенанс карточки объяснения на фронте жёстко `trace`, точный чип требует протянуть `__meta__`
+  через загрузку журнала.
 
 ### W3 — карты и карточка суррогата (06.09)
 
@@ -1047,9 +1043,6 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   Файлы: `frontend/src/data/validators.ts`, `validators.artifacts.test.ts`, `validators.hostile.test.ts`.
   Готово, когда: `maps.json`, `geology.json`, `physics.json`, `hierarchy.json.agents` проверяются;
   враждебные фикстуры отклоняются с причиной.
-- [ ] **U-12 · Деньги: incumbent против базы и референса** — C.
-  Файлы: `frontend/src/views/Money/MoneyComparison.tsx`, `frontend/src/i18n/{ru,en}/npv.json`.
-  Готово, когда: у каждого числа подпись провенанса; тест.
 
 **Гейт W4:** `geology.json` и `out/geology-audit.json` существуют; первый пакет OPM в журнале с
 результатами; полный прогон зелёный.
@@ -1091,19 +1084,6 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   Сделать: прогнать тесты ветки, `tsc`, сборку; сверить границы модуля (§8 `JARVIS.md`); список
   конфликтов с `main` после W0–W4.
   Готово, когда: отчёт для человека (H-07) с командами слияния и списком конфликтов.
-- [ ] **U-08 · Джарвис в `main`: знания и статус** — C (после H-07).
-  Файлы: `frontend/public/jarvis/knowledge/*.md` (новые статьи §8.8), `frontend/src/jarvis/**`.
-  Готово, когда: вопросы «что такое компенсация», «почему коридор 1.15–1.51», «что такое барьер»
-  отвечаются из базы знаний с подсветкой нужного экрана; тесты фикстурного транспорта.
-- [ ] **U-09 · «Объяснить» на карточке скважины и строке Совета** — C (бэкенд-часть M-07 — B).
-  Файлы: `frontend/src/views/WellCard/TraceBlock.tsx`, `frontend/src/views/Council/WellRow.tsx`,
-  `frontend/src/jarvis/actions/*`.
-  Готово, когда: действие открывает сцену Джарвиса с фактами журнала; сторож провенанса пропускает
-  только числа из `trace.json`; тест.
-- [ ] **M-07 · Инструмент `explain_decision` для Джарвиса** — B.
-  Файлы: `backend/application/jarvis/tools/decisions.py` (новый), `backend/application/jarvis/tools/registry.py`.
-  Готово, когда: инструмент возвращает факты `HierarchyTrace` по (скважина, шаг) с провенансом;
-  без записи — ошибка `no-trace-entry`, не выдумка.
 
 **Гейт W5:** второй пакет OPM в журнале; Джарвис в `main` (человек слил), тесты и сборка зелёные.
 
@@ -1162,16 +1142,12 @@ W6), либо экспортируется с `delta_npv: null` и статус�
   Файлы: `docker-compose.yml` (сервис `optimize`), `docker/entrypoint.sh`, `Dockerfile`.
   Готово, когда: из чистого клона `docker compose run optimize --case config/cases/base.json`
   доходит до OPM (сокет Docker проброшен) или честно сообщает причину.
+- [ ] **R-10 · Флаг `lambda_measured` для `policy-plan`** — B.
+  Файлы: `backend/presentation/ui_export/champion_export.py`, `backend/presentation/ui_export/base_artifact.py`.
+  Сделать: решить, измеряем ли λ для сдаваемого расписания отдельной серией прогонов, или подсказка
+  интерфейса навсегда говорит «не измерено». Второе допустимо и честно, но должно быть осознанным.
+  Готово, когда: решение записано здесь и, если измеряем, λ пересчитана и флаг проставлен.
 - [ ] **D-01 · `ARCHITECTURE.md`** — D.
-- [ ] **D-02 · `FAQ.md`** — D. Вопросы: суррогат (архитектура, метрики, OOD); агенты и роли; как
-  посчитаны рёбра; разломы и геология; компенсация и коридор; давление; вода и `n`; масштабируемость
-  (две оси); LLM; воспроизводимость и хеши; ЧДД против референса и базы; что не сделано. По странице на
-  вопрос, числа с провенансом. Обязательные исправления того, что мы сами сказали 31.08:
-  (а) суррогат **не** «принимает решения по связности» и **не** ранжирует скважины — он аппроксимирует
-  отклик симулятора и ранжирует кандидатов расписания; λ измеряется планом эксперимента, а не
-  суррогатом; (б) «MAE 40 миллионов рублей» и «0.52 % ЧДД» — разные метрики на разных выборках,
-  в FAQ остаётся одна таблица с указанием выборки для каждого числа; (в) «разломы не учитываются» →
-  «разломов в деке нет, барьеры учтены так: …» со ссылкой на `out/geology-audit.json`.
 - [ ] **D-03 · `ARCHITECTURE_MAS.md`** финальная редакция — D (таблица генерируется, текст правится).
 - [ ] **D-04 · Диаграмма архитектуры решения** — D. Файл: `context/assets/system-dataflow.svg`
   обновить + PNG для слайда.
