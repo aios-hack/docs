@@ -12,8 +12,7 @@
 | Как устроен код | `../aios/ARCHITECTURE.md` |
 | Точные формы данных | `../aios/backend/core/contracts/README.md` и Python-типы рядом |
 | Состав датасета | `../dataset-700/README.md` |
-| Что делать дальше, по шагам | [NIGHT_RUN_2026-09-09.md](NIGHT_RUN_2026-09-09.md) |
-| Полный список задач | [BACKLOG.md](BACKLOG.md) |
+| Что делать: все задачи проекта | [BACKLOG.md](BACKLOG.md) |
 | Почему такие приоритеты | [AUDIT_PLAN_2026-09-08.md](AUDIT_PLAN_2026-09-08.md) |
 | Аудит решения 08.09 | [8sept-audit/](8sept-audit/) |
 
