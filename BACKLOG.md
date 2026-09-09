@@ -47,7 +47,7 @@
 <a id="a"></a>
 ## A. Пакет сдачи, провенанс, воспроизводимость (SUB)
 
-### SUB-01 — Тип `SubmissionBundle` в контрактах
+### SUB-01 — Тип `SubmissionBundle` в контрактах — **СДЕЛАНО (aios@704752f, 09.09)**
 - **Что:** объявить `@dataclass(frozen=True, slots=True) SubmissionBundle` рядом с
   `SubmissionArtifact`: `canonical_schedule_hash`, `content_hash_submission`,
   `claimed_npv_rub`, `source_run_id`, `response_hash`, `deck_hash`, `economics_config_hash`,
@@ -60,7 +60,7 @@
 - **Приоритет:** critical
 - **Готово когда:** тип экспортируется из `backend.core.contracts`, есть тест на отказ при пустом хеше.
 
-### SUB-02 — Эмиссия `wells_schedule.inc` из нашего `Schedule`
+### SUB-02 — Эмиссия `wells_schedule.inc` из нашего `Schedule` — **СДЕЛАНО (aios@44f8242, 09.09)**
 - **Что:** вынести из `OpmDeckEmitter._emit_schedule` (`opm_deck.py:421`) публичную функцию
   `render_schedule_include(schedule, model_dir) -> EmittedSchedule`, возвращающую байты и
   `content_hash`. Сегодня наш план превращается в текст только внутри эмиссии OPM-дека, а
@@ -71,7 +71,7 @@
 - **Приоритет:** critical
 - **Готово когда:** функция вызывается вне `OpmDeckEmitter.emit` и возвращает те же байты, что попадают в OPM-дек (тест на равенство).
 
-### SUB-03 — Round-trip проверка эмитированного плана
+### SUB-03 — Round-trip проверка эмитированного плана — **СДЕЛАНО (aios@44f8242, 09.09)**
 - **Что:** после `render_schedule_include` перечитать байты `parse_schedule` + `build_schedule`,
   канонизировать и сверить `hash_schedule` с исходным; при расхождении — `ScheduleEmitError`
   с позицией первого различия.
@@ -82,7 +82,7 @@
 - **Приоритет:** critical
 - **Готово когда:** тест: изменение одного события ломает round-trip.
 
-### SUB-04 — Хеш ограничений кейса
+### SUB-04 — Хеш ограничений кейса — **СДЕЛАНО (aios@704752f, 09.09)**
 - **Что:** функция `constraints_hash(constraints) -> str` на `canonical_bytes` от
   `constraints_to_json`.
 - **Зачем:** пакет сдачи и манифест должны фиксировать, под какими условиями получено число.
@@ -91,7 +91,7 @@
 - **Приоритет:** critical
 - **Готово когда:** одинаковые кейсы дают одинаковый хеш независимо от порядка ключей.
 
-### SUB-05 — Утилита провенанса среды
+### SUB-05 — Утилита провенанса среды — **СДЕЛАНО (aios@704752f, 09.09)**
 - **Что:** модуль `backend/core/provenance.py` с `git_commit()`, `git_dirty()`,
   `opm_image()` (из `OPM_FLOW_IMAGE`/умолчания), `python_version()`, `package_versions()`.
   Отсутствие git — не исключение, а `None` с пометкой.
@@ -230,7 +230,7 @@
 - **Приоритет:** high
 - **Готово когда:** кейс с блокирующим ограничением без источника отклоняется с именем поля.
 
-### CON-02 — Семантика `n` без доли реинжекции
+### CON-02 — Семантика `n` без доли реинжекции — **СДЕЛАНО (aios@018548e, 09.09)**
 - **Что:** в `water_supply_policy` разрешить `external_water_m3_per_day` без
   `water_reinjection_fraction`, подставляя `fraction = 1.0` и помечая подстановку в
   возвращаемой политике (`fraction_defaulted: bool`); «источник не ограничен» задавать явным
@@ -960,7 +960,7 @@
 <a id="h"></a>
 ## H. Интерфейс и витрина (UI)
 
-### UI-01 — Починить маршруты `/api/runs`
+### UI-01 — Починить маршруты `/api/runs` — **СДЕЛАНО (aios@3a768cf, 09.09)**
 - **Что:** свести дублирующиеся `do_GET`/`do_POST` в `SpaRequestHandler` в по одному методу:
   jarvis-прокси → API прогонов → статика.
 - **Файлы:** `backend/presentation/cli/web.py:39,47,78,84`.
@@ -968,7 +968,7 @@
 - **Приоритет:** critical
 - **Готово когда:** `GET/POST /api/runs` и `/api/jarvis/*` работают одновременно.
 
-### UI-02 — Тест маршрутизации
+### UI-02 — Тест маршрутизации — **СДЕЛАНО (aios@3a768cf, 09.09)**
 - **Что:** тест, поднимающий обработчик и проверяющий четыре маршрута.
 - **Файлы:** `tests/presentation/test_web_runs.py`.
 - **Зависит:** UI-01
@@ -1172,7 +1172,7 @@
 <a id="k"></a>
 ## K. Тесты, окружение, качество (TST)
 
-### TST-01 — Тест кейса с `n`
+### TST-01 — Тест кейса с `n` — **СДЕЛАНО (aios@018548e, 09.09)**
 - **Что:** привести `test_case_with_outages_and_limits_is_accepted` в соответствие с решением CON-02.
 - **Зависит:** CON-02
 - **Приоритет:** critical
