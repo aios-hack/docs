@@ -13,6 +13,7 @@
 | Точные формы данных | `../aios/backend/core/contracts/README.md` и Python-типы рядом |
 | Состав датасета | `../dataset-700/README.md` |
 | Что делать: все задачи проекта | [BACKLOG.md](BACKLOG.md) |
+| Текущий фокус: модель и высокий реальный ЧДД к 11.09 | [Задачи M-01…M-12](BACKLOG.md#model-recovery) |
 | Почему такие приоритеты | [AUDIT_PLAN_2026-09-08.md](AUDIT_PLAN_2026-09-08.md) |
 | Аудит решения 08.09 | [8sept-audit/](8sept-audit/) |
 
